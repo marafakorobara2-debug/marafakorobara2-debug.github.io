@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { listServices, type ManagedService } from "@/lib/content-store";
 import { ContactStrip, PortfolioGrid, ServiceCard } from "./components";
+
+export const dynamic = "force-dynamic";
 
 const services = [
   {
@@ -44,7 +47,24 @@ const services = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  let managedServices: ManagedService[] = [];
+  try {
+    managedServices = await listServices();
+  } catch {
+    // Le contenu statique reste disponible avant la première migration de la base.
+  }
+  const displayedServices = managedServices.length > 0
+    ? managedServices.map((service, index) => ({
+        index: String(index + 1).padStart(2, "0"),
+        title: service.title,
+        description: service.description,
+        tags: service.tags,
+        tone: service.tone,
+        media: service.media,
+      }))
+    : services;
+
   return (
     <>
       <main>
@@ -121,7 +141,7 @@ export default function Home() {
             </p>
           </div>
           <div className="services-grid">
-            {services.map((service) => <ServiceCard key={service.index} {...service} />)}
+            {displayedServices.map((service) => <ServiceCard key={`${service.index}-${service.title}`} {...service} />)}
           </div>
           <div className="center-action">
             <Link href="/services" className="text-link">Découvrir tous nos services <span>→</span></Link>

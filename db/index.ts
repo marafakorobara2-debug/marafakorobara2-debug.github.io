@@ -11,3 +11,18 @@ export function getDb() {
 
   return drizzle(env.DB, { schema });
 }
+
+export function getD1(): D1Database {
+  if (!env.DB) {
+    throw new Error("Cloudflare D1 binding `DB` is unavailable.");
+  }
+  return env.DB;
+}
+
+export function getMediaBucket(): R2Bucket {
+  const bindings = env as typeof env & { MEDIA?: R2Bucket };
+  if (!bindings.MEDIA) {
+    throw new Error("Cloudflare R2 binding `MEDIA` is unavailable.");
+  }
+  return bindings.MEDIA;
+}
