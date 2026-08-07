@@ -168,32 +168,62 @@ export function ContactStrip() {
 
 export function QuoteForm() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const message = [
-      "Bonjour Go Digital, je souhaite demander un devis.",
-      `Nom : ${data.get("name")}`,
-      `Téléphone : ${data.get("phone")}`,
-      `Service : ${data.get("service")}`,
-      `Projet : ${data.get("message")}`,
-    ].join("\n");
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-    setSent(true);
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setSending(true);
+    setSent(false);
+    setError(false);
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/marafakorobara2@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          Nom: data.get("name"),
+          Email: data.get("email"),
+          "Téléphone / WhatsApp": data.get("phone"),
+          Service: data.get("service"),
+          Projet: data.get("message"),
+          _honey: data.get("company"),
+          _subject: "Nouvelle demande de devis — Go Digital",
+          _template: "table",
+          _captcha: "false",
+          _url: window.location.href,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Email delivery failed");
+      form.reset();
+      setSent(true);
+    } catch {
+      setError(true);
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <form className="quote-form" onSubmit={handleSubmit} id="devis">
-      <div className="form-heading"><span>Parlez-nous de votre projet</span><h2>Demander un devis</h2><p>Quelques informations suffisent. Votre demande sera préparée et ouverte dans WhatsApp.</p></div>
+      <div className="form-heading"><span>Parlez-nous de votre projet</span><h2>Demander un devis</h2><p>Quelques informations suffisent. Votre demande sera envoyée directement à notre adresse e-mail.</p></div>
       <div className="form-grid">
         <label><span>Votre nom *</span><input name="name" required placeholder="Ex. Aminata Traoré" /></label>
         <label><span>Téléphone / WhatsApp *</span><input name="phone" type="tel" required placeholder="Ex. +223 70 00 00 00" /></label>
+        <label className="form-full"><span>Votre e-mail *</span><input name="email" type="email" required placeholder="Ex. vous@entreprise.com" /></label>
         <label className="form-full"><span>Service souhaité *</span><select name="service" required defaultValue=""><option value="" disabled>Choisir un service</option><option>Design graphique & branding</option><option>Photographie & vidéographie</option><option>Production audiovisuelle</option><option>Marketing digital</option><option>Services numériques</option></select></label>
         <label className="form-full"><span>Décrivez votre projet *</span><textarea name="message" required rows={5} placeholder="Votre objectif, le livrable souhaité, le délai..." /></label>
+        <label className="honey-field" aria-hidden="true"><span>Entreprise</span><input name="company" tabIndex={-1} autoComplete="off" /></label>
       </div>
-      <button className="button button-primary form-submit" type="submit">Envoyer sur WhatsApp <span>↗</span></button>
-      {sent && <p className="form-note" role="status">Votre message est prêt dans WhatsApp.</p>}
+      <button className="button button-primary form-submit" type="submit" disabled={sending}>{sending ? "Envoi en cours…" : "Envoyer la demande"} <span>↗</span></button>
+      {sent && <p className="form-note" role="status">Merci ! Votre demande a bien été envoyée par e-mail.</p>}
+      {error && <p className="form-note form-error" role="alert">L&apos;envoi a échoué. Vous pouvez nous contacter directement sur WhatsApp ou réessayer.</p>}
     </form>
   );
 }
