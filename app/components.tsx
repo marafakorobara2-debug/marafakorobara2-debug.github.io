@@ -12,6 +12,7 @@ const navItems = [
   ["Portfolio", "/portfolio"],
   ["Contact", "/contact"],
   ["Inscription", "/inscription"],
+  ["Connexion", "/connexion"],
 ] as const;
 
 export function SiteHeader() {
