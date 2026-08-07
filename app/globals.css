@@ -236,7 +236,8 @@ img { display: block; max-width: 100%; }
 .admin-heading h1 em { color:var(--orange); font-style:normal; }
 .admin-heading > div:first-child > p { color:var(--muted); max-width:630px; line-height:1.7; }
 .admin-account { flex:0 0 285px; border:1px solid var(--line); border-radius:20px; padding:22px; background:rgba(255,255,255,.025); display:flex; flex-direction:column; align-items:flex-start; }
-.admin-account span { color:#6f7d91; font-size:9px; text-transform:uppercase; letter-spacing:.14em; }.admin-account strong { margin:10px 0 3px; }.admin-account small { color:#8f9bae; }.admin-account a { color:var(--orange); font-size:11px; border-bottom:1px solid rgba(255,122,26,.4); padding-bottom:4px; margin-top:18px; }
+.admin-account span { color:#6f7d91; font-size:9px; text-transform:uppercase; letter-spacing:.14em; }.admin-account strong { margin:10px 0 3px; }.admin-account small { color:#8f9bae; }.admin-account a,.admin-account button { color:var(--orange); font-size:11px; border:0; border-bottom:1px solid rgba(255,122,26,.4); background:transparent; padding:0 0 4px; margin-top:18px; cursor:pointer; }.admin-account form { margin:0; }
+.login-card { max-width:900px; }.admin-login-form { margin-top:20px; }
 .admin-dashboard { padding-top:44px; }
 .admin-notice { position:sticky; top:96px; z-index:20; margin-bottom:20px; padding:15px 18px; border:1px solid rgba(135,223,57,.35); border-radius:14px; color:#c8f7a8; background:rgba(24,67,29,.92); backdrop-filter:blur(16px); }
 .admin-notice.is-error { color:#ffd0c8; border-color:rgba(255,93,73,.38); background:rgba(84,27,25,.94); }

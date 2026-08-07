@@ -1,21 +1,14 @@
-import { getChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
-import { isAdminUser } from "@/lib/content-store";
+import { hasAdminSession } from "@/lib/admin-session";
 
 export async function requireAdminForApi(): Promise<
-  { user: ChatGPTUser; error?: never } | { user?: never; error: Response }
+  { authenticated: true; error?: never } | { authenticated?: never; error: Response }
 > {
-  const user = await getChatGPTUser();
-  if (!user) {
+  if (!(await hasAdminSession())) {
     return {
       error: Response.json({ error: "Connexion requise." }, { status: 401 }),
     };
   }
-  if (!isAdminUser(user)) {
-    return {
-      error: Response.json({ error: "Accès administrateur refusé." }, { status: 403 }),
-    };
-  }
-  return { user };
+  return { authenticated: true };
 }
 
 export function apiError(error: unknown): Response {
