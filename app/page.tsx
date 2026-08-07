@@ -77,15 +77,17 @@ export default function Home() {
           <div className="hero-visual reveal reveal-delay">
             <div className="hero-orbit orbit-one" />
             <div className="hero-orbit orbit-two" />
-            <div className="logo-stage">
+            <div className="logo-stage founder-stage">
               <div className="logo-stage-shine" />
-              <img src="/logo-go-digital.jpeg" alt="Logo Go Digital" />
-              <div className="stage-caption">
-                <span>Créativité</span>
-                <i />
-                <span>Impact</span>
-                <i />
-                <span>Digital</span>
+              <img
+                src="/fondateur-go-digital-camera.jpeg"
+                alt="Créatif Go Digital tenant un appareil photo"
+                fetchPriority="high"
+              />
+              <div className="founder-vignette" />
+              <div className="founder-caption">
+                <small>GO DIGITAL • DIRECTION CRÉATIVE</small>
+                <strong>L&apos;image au cœur de chaque projet.</strong>
               </div>
             </div>
             <div className="floating-card floating-card-top">
@@ -140,10 +142,19 @@ export default function Home() {
         </section>
 
         <section className="section section-shell about-preview">
-          <div className="about-art" aria-hidden="true">
+          <div className="about-art about-photo-collage">
             <div className="about-art-grid" />
-            <div className="about-art-word">GO</div>
-            <div className="about-art-badge">Idées<br />en mouvement</div>
+            <img
+              src="/fondateur-go-digital-boubou.jpeg"
+              alt="Portrait professionnel Go Digital en tenue bleue"
+              loading="lazy"
+            />
+            <img
+              src="/fondateur-go-digital-bureau.png"
+              alt="Go Digital au travail dans un espace professionnel"
+              loading="lazy"
+            />
+            <div className="about-art-badge">Créatif<br />& engagé</div>
           </div>
           <div className="about-copy">
             <div className="eyebrow"><span /> À propos</div>
