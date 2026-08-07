@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { chatGPTSignOutPath, requireChatGPTUser } from "../chatgpt-auth";
-import { isAdminUser, listServices, upsertProfile } from "@/lib/content-store";
+import { isAdminUser, listRegistrations, listServices, upsertProfile } from "@/lib/content-store";
 import { AdminDashboard } from "./AdminDashboard";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,10 @@ export default async function AdminPage() {
     );
   }
 
-  const services = await listServices({ includeUnpublished: true });
+  const [services, registrations] = await Promise.all([
+    listServices({ includeUnpublished: true }),
+    listRegistrations(),
+  ]);
 
   return (
     <main className="admin-page section-shell">
@@ -48,7 +51,7 @@ export default async function AdminPage() {
           <Link href={chatGPTSignOutPath("/")}>Se déconnecter</Link>
         </div>
       </header>
-      <AdminDashboard initialServices={services} />
+      <AdminDashboard initialServices={services} initialRegistrations={registrations} />
     </main>
   );
 }
