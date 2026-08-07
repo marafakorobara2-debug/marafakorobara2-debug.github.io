@@ -11,6 +11,7 @@ const navItems = [
   ["Services", "/services"],
   ["Portfolio", "/portfolio"],
   ["Contact", "/contact"],
+  ["Compte", "/inscription"],
 ] as const;
 
 export function SiteHeader() {
@@ -94,13 +95,26 @@ type ServiceCardProps = {
   description: string;
   tags: string[];
   tone: string;
+  media?: { kind: "image" | "video"; url: string; altText: string; title: string }[];
 };
 
-export function ServiceCard({ index, title, description, tags, tone }: ServiceCardProps) {
+export function ServiceCard({ index, title, description, tags, tone, media = [] }: ServiceCardProps) {
+  const featured = media[0];
   return (
     <article className={`service-card tone-${tone}`}>
       <div className="service-card-top"><span className="service-index">{index}</span><span className="service-arrow">↗</span></div>
-      <div className="service-symbol" aria-hidden="true"><span>{title.charAt(0)}</span></div>
+      {featured ? (
+        <div className="service-card-media">
+          {featured.kind === "video" ? (
+            <video src={featured.url} muted playsInline preload="metadata" />
+          ) : (
+            <img src={featured.url} alt={featured.altText || featured.title || title} loading="lazy" />
+          )}
+          {featured.kind === "video" && <span className="media-play">▶</span>}
+        </div>
+      ) : (
+        <div className="service-symbol" aria-hidden="true"><span>{title.charAt(0)}</span></div>
+      )}
       <h3>{title}</h3><p>{description}</p>
       <div className="tag-row">{tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
     </article>

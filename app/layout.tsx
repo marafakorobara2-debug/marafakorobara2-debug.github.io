@@ -3,7 +3,7 @@ import { SiteFooter, SiteHeader, WhatsAppButton } from "./components";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://marafakorobara2-debug.github.io"),
+  metadataBase: new URL("https://go-digital-bamako.ramon-jacobi53.chatgpt.site"),
   title: {
     default: "Go Digital — Agence créative à Bamako",
     template: "%s | Go Digital",
