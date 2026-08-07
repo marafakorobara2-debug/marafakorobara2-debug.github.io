@@ -13,6 +13,19 @@ export const profiles = sqliteTable(
   (table) => [uniqueIndex("idx_profiles_email").on(table.email)],
 );
 
+export const registrations = sqliteTable(
+  "registrations",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [uniqueIndex("idx_registrations_email").on(table.email)],
+);
+
 export const services = sqliteTable(
   "services",
   {

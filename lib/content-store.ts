@@ -31,6 +31,14 @@ export type ManagedService = {
   media: ServiceMediaItem[];
 };
 
+export type VisitorRegistration = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+};
+
 type ServiceRow = {
   id: number;
   slug: string;
@@ -119,6 +127,50 @@ export async function upsertProfile(user: ChatGPTUser): Promise<void> {
     )
     .bind(user.userId, user.email.toLowerCase(), user.displayName)
     .run();
+}
+
+export async function registerVisitor(input: {
+  name: string;
+  email: string;
+  phone: string;
+}): Promise<void> {
+  await getD1()
+    .prepare(
+      `INSERT INTO registrations (name, email, phone)
+       VALUES (?, ?, ?)
+       ON CONFLICT(email) DO UPDATE SET
+         name = excluded.name,
+         phone = excluded.phone,
+         updated_at = CURRENT_TIMESTAMP`,
+    )
+    .bind(input.name, input.email.toLowerCase(), input.phone)
+    .run();
+}
+
+export async function listRegistrations(): Promise<VisitorRegistration[]> {
+  const result = await getD1()
+    .prepare(
+      `SELECT id, name, email, phone, created_at
+       FROM registrations
+       ORDER BY created_at DESC, id DESC`,
+    )
+    .all<{ id: number; name: string; email: string; phone: string; created_at: string }>();
+
+  return (result.results ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function deleteRegistration(id: number): Promise<boolean> {
+  const result = await getD1()
+    .prepare("DELETE FROM registrations WHERE id = ?")
+    .bind(id)
+    .run();
+  return result.meta.changes > 0;
 }
 
 async function ensureDefaultServices(): Promise<void> {

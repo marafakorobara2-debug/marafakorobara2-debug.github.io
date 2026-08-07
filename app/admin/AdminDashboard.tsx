@@ -1,12 +1,19 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import type { ManagedService } from "@/lib/content-store";
+import type { ManagedService, VisitorRegistration } from "@/lib/content-store";
 
 const tones = ["orange", "blue", "violet", "cyan", "green"];
 
-export function AdminDashboard({ initialServices }: { initialServices: ManagedService[] }) {
+export function AdminDashboard({
+  initialServices,
+  initialRegistrations,
+}: {
+  initialServices: ManagedService[];
+  initialRegistrations: VisitorRegistration[];
+}) {
   const [services, setServices] = useState(initialServices);
+  const [registrations, setRegistrations] = useState(initialRegistrations);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
@@ -16,6 +23,13 @@ export function AdminDashboard({ initialServices }: { initialServices: ManagedSe
     const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || "Impossible d’actualiser les services.");
     setServices(data.services as ManagedService[]);
+  }
+
+  async function refreshRegistrations() {
+    const response = await fetch("/api/admin/registrations", { cache: "no-store" });
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(data.error || "Impossible d’actualiser les inscriptions.");
+    setRegistrations(data.registrations as VisitorRegistration[]);
   }
 
   async function create(event: FormEvent<HTMLFormElement>) {
@@ -63,6 +77,21 @@ export function AdminDashboard({ initialServices }: { initialServices: ManagedSe
     }
   }
 
+  async function removeRegistration(registration: VisitorRegistration) {
+    if (!window.confirm(`Supprimer l’inscription de ${registration.name} ?`)) return;
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/admin/registrations/${registration.id}`, { method: "DELETE" });
+      const payload = await readJson(response);
+      if (!response.ok) throw new Error(payload.error || "Suppression impossible.");
+      await refreshRegistrations();
+      setNotice("L’inscription a été supprimée.");
+    } catch (caught) {
+      setError(messageFrom(caught));
+    }
+  }
+
   return (
     <div className="admin-dashboard">
       {(notice || error) && (
@@ -101,6 +130,33 @@ export function AdminDashboard({ initialServices }: { initialServices: ManagedSe
             />
           ))}
         </div>
+      </section>
+
+      <section className="admin-services-section admin-registrations-section">
+        <div className="admin-panel-heading">
+          <div><span>03</span><h2>Personnes inscrites</h2></div>
+          <p>{registrations.length} inscription{registrations.length > 1 ? "s" : ""}</p>
+        </div>
+        {registrations.length === 0 ? (
+          <div className="registration-empty">Les nouvelles inscriptions apparaîtront ici.</div>
+        ) : (
+          <div className="registration-table-wrap">
+            <table className="registration-table">
+              <thead><tr><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Date</th><th /></tr></thead>
+              <tbody>
+                {registrations.map((registration) => (
+                  <tr key={registration.id}>
+                    <td><strong>{registration.name}</strong></td>
+                    <td><a href={`mailto:${registration.email}`}>{registration.email}</a></td>
+                    <td><a href={`tel:${registration.phone}`}>{registration.phone}</a></td>
+                    <td>{formatDate(registration.createdAt)}</td>
+                    <td><button type="button" onClick={() => removeRegistration(registration)}>Supprimer</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -236,6 +292,7 @@ function ServiceEditor({
 type ApiPayload = {
   error?: string;
   services?: ManagedService[];
+  registrations?: VisitorRegistration[];
   [key: string]: unknown;
 };
 
@@ -249,4 +306,11 @@ async function readJson(response: Response): Promise<ApiPayload> {
 
 function messageFrom(value: unknown): string {
   return value instanceof Error ? value.message : "Une erreur inattendue est survenue.";
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value.replace(" ", "T") + "Z");
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(date);
 }
