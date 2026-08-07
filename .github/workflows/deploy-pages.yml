@@ -3,7 +3,7 @@ name: Publier Go Digital sur GitHub Pages
 on:
   push:
     branches:
-      - agent/github-pages
+      - main
   workflow_dispatch:
 
 permissions:
